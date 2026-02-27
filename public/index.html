@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Anomalous URL Shortener</title>
+    <style>
+        body { font-family: sans-serif; max-width: 500px; margin: 50px auto; text-align: center; }
+        input { width: 80%; padding: 10px; margin: 10px 0; }
+        button { padding: 10px 20px; cursor: pointer; background: #007bff; color: white; border: none; }
+        #result { margin-top: 30px; border: 1px solid #ddd; padding: 20px; display: none; }
+    </style>
+</head>
+<body>
+    <h2>Anomalous URL Shortener</h2>
+    <input type="text" id="longUrl" placeholder="Enter Your Long URL">
+    <input type="text" id="pin" placeholder="Set an Access PIN">
+    <button onclick="shorten()">Shorten</button>
+
+    <div id="result">
+        <p>Here's your short URL: <a id="shortLink" href="" target="_blank"></a></p>
+        <img id="qrImage" src="" alt="QR Code">
+    </div>
+
+    <script>
+        async function shorten() {
+            const longUrl = document.getElementById('longUrl').value;
+            const pin = document.getElementById('pin').value;
+
+            const res = await fetch('/shorten', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ longUrl, pin })
+            });
+
+            const data = await res.json();
+            if (res.status === 201) {
+                document.getElementById('result').style.display = 'block';
+                document.getElementById('shortLink').innerText = data.shortUrl;
+                document.getElementById('shortLink').href = data.shortUrl;
+                document.getElementById('qrImage').src = data.qrCodeData;
+            } else {
+                alert(data.error);
+            }
+        }
+    </script>
+</body>
+</html>
